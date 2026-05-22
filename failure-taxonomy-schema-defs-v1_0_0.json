@@ -1,0 +1,208 @@
+{
+  "$comment": "Failure Taxonomy Schema Definitions v1.0.0 - Merge into adl-schema.json $defs. Expanded from 16 to 24 modes (4 domains × 6 modes each).",
+
+  "failureTaxonomyDefs": {
+
+    "failureDomainLabel": {
+      "type": "string",
+      "enum": ["structural", "semantic", "pragmatic", "epistemic"],
+      "description": "Human-readable domain labels for authoring (normalized to code on ingest)"
+    },
+
+    "failureDomainCode": {
+      "type": "string",
+      "enum": ["STR", "SEM", "PRA", "EPI"],
+      "description": "Canonical domain codes for storage and queries"
+    },
+
+    "failureModeCode": {
+      "type": "string",
+      "pattern": "^(STR|SEM|PRA|EPI)-[A-Z]{3}$",
+      "description": "Fully-qualified mode codes (domain prefix + 3-letter mode). Pattern-based for forward compatibility.",
+      "$comment": "Known codes (v1.0.0, 24 modes): STR-OMI, STR-EXC, STR-MAL, STR-INC, STR-SYN, STR-FMT, SEM-INC, SEM-COM, SEM-AMB, SEM-COH, SEM-TYP, SEM-LOG, PRA-ALI, PRA-MAT, PRA-EFF, PRA-FRA, PRA-DOC, PRA-TST, EPI-OVR, EPI-UND, EPI-GRN, EPI-FAL, EPI-VAL, EPI-VER"
+    },
+
+    "knownFailureModes": {
+      "$comment": "Reference list of known modes (v1.0.0) - NOT used for validation (use failureModeCode pattern instead). 4 domains × 6 modes = 24 total.",
+      "enum": [
+        "STR-OMI", "STR-EXC", "STR-MAL", "STR-INC", "STR-SYN", "STR-FMT",
+        "SEM-INC", "SEM-COM", "SEM-AMB", "SEM-COH", "SEM-TYP", "SEM-LOG",
+        "PRA-ALI", "PRA-MAT", "PRA-EFF", "PRA-FRA", "PRA-DOC", "PRA-TST",
+        "EPI-OVR", "EPI-UND", "EPI-GRN", "EPI-FAL", "EPI-VAL", "EPI-VER"
+      ]
+    },
+
+    "knownFailureModeDescriptions": {
+      "$comment": "Human-readable descriptions for each mode. Matches production failure_taxonomy table. Reference only — not used for validation.",
+      "properties": {
+        "STR-OMI": { "description": "Required element missing" },
+        "STR-EXC": { "description": "Unnecessary element present" },
+        "STR-MAL": { "description": "Element has wrong structure" },
+        "STR-INC": { "description": "Elements contradict structurally" },
+        "STR-SYN": { "description": "Syntax or formatting error" },
+        "STR-FMT": { "description": "Format or layout issue" },
+        "SEM-INC": { "description": "Factually or logically wrong" },
+        "SEM-COM": { "description": "Partially correct, missing key aspects" },
+        "SEM-AMB": { "description": "Multiple valid interpretations" },
+        "SEM-COH": { "description": "Internal logical contradiction" },
+        "SEM-TYP": { "description": "Type system violation" },
+        "SEM-LOG": { "description": "Logical reasoning flaw" },
+        "PRA-ALI": { "description": "Does not serve stated purpose" },
+        "PRA-MAT": { "description": "Wrong for audience or context" },
+        "PRA-EFF": { "description": "Achieves goal suboptimally" },
+        "PRA-FRA": { "description": "Works now but breaks under change" },
+        "PRA-DOC": { "description": "Missing or inadequate documentation" },
+        "PRA-TST": { "description": "Insufficient test coverage" },
+        "EPI-OVR": { "description": "Confidence exceeds evidence" },
+        "EPI-UND": { "description": "Evidence exceeds expressed confidence" },
+        "EPI-GRN": { "description": "Claims without traceable support" },
+        "EPI-FAL": { "description": "No way to verify or refute" },
+        "EPI-VAL": { "description": "Validation or verification gap" },
+        "EPI-VER": { "description": "Claim cannot be independently verified" }
+      }
+    },
+
+    "severityLabel": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low", "info"],
+      "description": "Human-readable severity labels (5-level scale)"
+    },
+
+    "severityCode": {
+      "type": "string",
+      "enum": ["C", "H", "M", "L", "I"],
+      "description": "Single-letter severity codes for compound failure codes"
+    },
+
+    "failureCodePattern": {
+      "type": "string",
+      "pattern": "^(STR|SEM|PRA|EPI)-[A-Z]{3}/[CHMLI]$",
+      "description": "Complete failure code: {DOMAIN}-{MODE}/{SEVERITY}. Pattern-based for forward compatibility.",
+      "examples": ["STR-OMI/C", "SEM-TYP/H", "PRA-DOC/M", "EPI-VER/L", "STR-SYN/I"]
+    },
+
+    "classificationSource": {
+      "type": "string",
+      "enum": ["agent", "classifier", "human"],
+      "description": "Source of classification: agent (static definition), classifier (runtime inference), human (manual assignment)"
+    },
+
+    "confidenceLevel": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Classifier confidence level"
+    },
+
+    "taxonomyVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of taxonomy used for classification",
+      "examples": ["1.0.0"]
+    },
+
+    "failureTaxonomy": {
+      "type": "object",
+      "description": "Criterion-level taxonomy definition (static, definition-time)",
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/failureDomainLabel",
+          "description": "Word label for human readability (normalized to code on ingest)"
+        },
+        "failure_mode": {
+          "$ref": "#/$defs/failureModeCode",
+          "description": "Fully-qualified mode code (e.g., SEM-INC, SEM-TYP)"
+        },
+        "default_severity": {
+          "$ref": "#/$defs/severityLabel",
+          "description": "Default severity when this criterion fails"
+        }
+      },
+      "required": ["failure_mode"],
+      "additionalProperties": false
+    },
+
+    "classificationMetadata": {
+      "type": "object",
+      "description": "Provenance tracking for classification",
+      "properties": {
+        "classified_by": {
+          "$ref": "#/$defs/classificationSource",
+          "description": "Source of this classification"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidenceLevel",
+          "description": "Classifier confidence (required for classifier/human sources)"
+        },
+        "taxonomy_version": {
+          "$ref": "#/$defs/taxonomyVersion",
+          "description": "Version of taxonomy used"
+        }
+      },
+      "required": ["classified_by", "taxonomy_version"],
+      "additionalProperties": false
+    },
+
+    "failureClassification": {
+      "type": "object",
+      "description": "Issue-level classification (dynamic, runtime)",
+      "properties": {
+        "failure_domain": {
+          "$ref": "#/$defs/failureDomainCode",
+          "description": "Domain code (derived from failure_mode, stored for indexing)"
+        },
+        "failure_mode": {
+          "$ref": "#/$defs/failureModeCode",
+          "description": "Primary failure mode code"
+        },
+        "failure_code": {
+          "$ref": "#/$defs/failureCodePattern",
+          "description": "Complete failure code including severity"
+        },
+        "secondary_failure_codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/failureCodePattern"
+          },
+          "maxItems": 3,
+          "description": "Optional secondary classifications for cross-domain issues"
+        },
+        "classification_metadata": {
+          "$ref": "#/$defs/classificationMetadata",
+          "description": "Provenance tracking"
+        }
+      },
+      "required": ["failure_mode"],
+      "additionalProperties": false
+    },
+
+    "outputClassificationConfig": {
+      "type": "object",
+      "description": "Agent output configuration for classification",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable runtime classification in output"
+        },
+        "require_classification": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require all issues to be classified (fail if missing)"
+        },
+        "allow_secondary": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow secondary failure codes for cross-domain issues"
+        },
+        "default_taxonomy_version": {
+          "$ref": "#/$defs/taxonomyVersion",
+          "default": "1.0.0",
+          "description": "Taxonomy version to use for this agent"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+
+  "$comment_integration": "To integrate into adl-schema.json, add these to $defs and update criterion to include failure_taxonomy property"
+}
