@@ -1,3 +1,5 @@
+**[UluOps](https://uluops.ai)** · Operating Intelligence as Infrastructure
+
 # Failure Taxonomy
 
 A linguistically-grounded classification system for quality failures detected by AI validation agents. Four orthogonal domains derived from the hierarchy of language analysis — Structural, Semantic, Pragmatic — extended with a novel fourth domain, Epistemic, that treats evidential status as a first-class failure category.
@@ -54,6 +56,7 @@ Failure mode codes are validated using pattern-based matching rather than enumer
 - [Agents & Pipelines](https://github.com/aself101/agents-and-pipelines) — Agent definitions that produce classified findings
 - [Cognitive Lens Library](https://github.com/Uluops/cognitive-lens-library) — Thinker profiles whose cognitive parallax the taxonomy measures
 - [UluOps](https://uluops.ai) — The platform infrastructure for tracking and analyzing classified findings
+- [UluOps Registry — Specs](https://registry.uluops.ai/specs/adl) — Live rendered specifications
 
 ## License
 
