@@ -1,5 +1,5 @@
 {
-  "$comment": "Failure Taxonomy Schema Definitions v1.0.0 - Merge into adl-schema.json $defs. Expanded from 16 to 24 modes (4 domains × 6 modes each).",
+  "$comment": "Failure Taxonomy Schema Definitions v1.1.0 - Merge into adl-schema.json $defs. Expanded from 24 to 28 modes (4 domains × 7 modes each). THIS FILE IS THE CANONICAL SOURCE for the failure mode set; every other copy derives from it.",
 
   "failureTaxonomyDefs": {
 
@@ -19,46 +19,50 @@
       "type": "string",
       "pattern": "^(STR|SEM|PRA|EPI)-[A-Z]{3}$",
       "description": "Fully-qualified mode codes (domain prefix + 3-letter mode). Pattern-based for forward compatibility.",
-      "$comment": "Known codes (v1.0.0, 24 modes): STR-OMI, STR-EXC, STR-MAL, STR-INC, STR-SYN, STR-FMT, SEM-INC, SEM-COM, SEM-AMB, SEM-COH, SEM-TYP, SEM-LOG, PRA-ALI, PRA-MAT, PRA-EFF, PRA-FRA, PRA-DOC, PRA-TST, EPI-OVR, EPI-UND, EPI-GRN, EPI-FAL, EPI-VAL, EPI-VER"
+      "$comment": "Known codes (v1.1.0, 28 modes): STR-OMI, STR-EXC, STR-MAL, STR-INC, STR-SYN, STR-FMT, STR-ORG, SEM-INC, SEM-COM, SEM-AMB, SEM-COH, SEM-TYP, SEM-LOG, SEM-CAT, PRA-ALI, PRA-MAT, PRA-EFF, PRA-FRA, PRA-DOC, PRA-TST, PRA-ACT, EPI-OVR, EPI-UND, EPI-GRN, EPI-FAL, EPI-VAL, EPI-VER, EPI-SCP"
     },
 
     "knownFailureModes": {
-      "$comment": "Reference list of known modes (v1.0.0) - NOT used for validation (use failureModeCode pattern instead). 4 domains × 6 modes = 24 total.",
+      "$comment": "Reference list of known modes (v1.1.0) - NOT used for validation (use failureModeCode pattern instead; see systems spec §7.3 and §10.1 novelty claim #4). 4 domains × 7 modes = 28 total. Budget is 7 per domain by design.",
       "enum": [
-        "STR-OMI", "STR-EXC", "STR-MAL", "STR-INC", "STR-SYN", "STR-FMT",
-        "SEM-INC", "SEM-COM", "SEM-AMB", "SEM-COH", "SEM-TYP", "SEM-LOG",
-        "PRA-ALI", "PRA-MAT", "PRA-EFF", "PRA-FRA", "PRA-DOC", "PRA-TST",
-        "EPI-OVR", "EPI-UND", "EPI-GRN", "EPI-FAL", "EPI-VAL", "EPI-VER"
+        "STR-OMI", "STR-EXC", "STR-MAL", "STR-INC", "STR-SYN", "STR-FMT", "STR-ORG",
+        "SEM-INC", "SEM-COM", "SEM-AMB", "SEM-COH", "SEM-TYP", "SEM-LOG", "SEM-CAT",
+        "PRA-ALI", "PRA-MAT", "PRA-EFF", "PRA-FRA", "PRA-DOC", "PRA-TST", "PRA-ACT",
+        "EPI-OVR", "EPI-UND", "EPI-GRN", "EPI-FAL", "EPI-VAL", "EPI-VER", "EPI-SCP"
       ]
     },
 
     "knownFailureModeDescriptions": {
-      "$comment": "Human-readable descriptions for each mode. Matches production failure_taxonomy table. Reference only — not used for validation.",
+      "$comment": "Name and description for each mode. Names and descriptions for the original 24 match the production failure_taxonomy table verbatim (mode_name, description). Reference only — not used for validation. Downstream surfaces (render template, factory JSON, docs data) generate their labels from `name`.",
       "properties": {
-        "STR-OMI": { "description": "Required element missing" },
-        "STR-EXC": { "description": "Unnecessary element present" },
-        "STR-MAL": { "description": "Element has wrong structure" },
-        "STR-INC": { "description": "Elements contradict structurally" },
-        "STR-SYN": { "description": "Syntax or formatting error" },
-        "STR-FMT": { "description": "Format or layout issue" },
-        "SEM-INC": { "description": "Factually or logically wrong" },
-        "SEM-COM": { "description": "Partially correct, missing key aspects" },
-        "SEM-AMB": { "description": "Multiple valid interpretations" },
-        "SEM-COH": { "description": "Internal logical contradiction" },
-        "SEM-TYP": { "description": "Type system violation" },
-        "SEM-LOG": { "description": "Logical reasoning flaw" },
-        "PRA-ALI": { "description": "Does not serve stated purpose" },
-        "PRA-MAT": { "description": "Wrong for audience or context" },
-        "PRA-EFF": { "description": "Achieves goal suboptimally" },
-        "PRA-FRA": { "description": "Works now but breaks under change" },
-        "PRA-DOC": { "description": "Missing or inadequate documentation" },
-        "PRA-TST": { "description": "Insufficient test coverage" },
-        "EPI-OVR": { "description": "Confidence exceeds evidence" },
-        "EPI-UND": { "description": "Evidence exceeds expressed confidence" },
-        "EPI-GRN": { "description": "Claims without traceable support" },
-        "EPI-FAL": { "description": "No way to verify or refute" },
-        "EPI-VAL": { "description": "Validation or verification gap" },
-        "EPI-VER": { "description": "Claim cannot be independently verified" }
+        "STR-OMI": { "name": "omission", "description": "Required element missing" },
+        "STR-EXC": { "name": "excess", "description": "Unnecessary element present" },
+        "STR-MAL": { "name": "malformation", "description": "Element has wrong structure" },
+        "STR-INC": { "name": "inconsistency", "description": "Elements contradict structurally" },
+        "STR-SYN": { "name": "syntax", "description": "Syntax or formatting error" },
+        "STR-FMT": { "name": "format", "description": "Format or layout issue" },
+        "STR-ORG": { "name": "organization", "description": "Content present but ungrouped or poorly ordered" },
+        "SEM-INC": { "name": "incorrectness", "description": "Factually or logically wrong" },
+        "SEM-COM": { "name": "incompleteness", "description": "Partially correct, missing key aspects" },
+        "SEM-AMB": { "name": "ambiguity", "description": "Multiple valid interpretations" },
+        "SEM-COH": { "name": "incoherence", "description": "Internal logical contradiction" },
+        "SEM-TYP": { "name": "type-error", "description": "Type system violation" },
+        "SEM-LOG": { "name": "logic-error", "description": "Logical reasoning flaw" },
+        "SEM-CAT": { "name": "misclassification", "description": "Assigned to the wrong category, or distinct kinds conflated" },
+        "PRA-ALI": { "name": "misalignment", "description": "Does not serve stated purpose" },
+        "PRA-MAT": { "name": "mismatch", "description": "Wrong for audience or context" },
+        "PRA-EFF": { "name": "inefficiency", "description": "Achieves goal suboptimally" },
+        "PRA-FRA": { "name": "fragility", "description": "Works now but breaks under change" },
+        "PRA-DOC": { "name": "documentation", "description": "Missing or inadequate documentation" },
+        "PRA-TST": { "name": "testing", "description": "Insufficient test coverage" },
+        "PRA-ACT": { "name": "inactionable", "description": "States a problem with no actionable consequence" },
+        "EPI-OVR": { "name": "overclaiming", "description": "Confidence exceeds evidence" },
+        "EPI-UND": { "name": "underclaiming", "description": "Evidence exceeds expressed confidence" },
+        "EPI-GRN": { "name": "ungrounded", "description": "Claims without traceable support" },
+        "EPI-FAL": { "name": "unfalsifiable", "description": "No way to verify or refute" },
+        "EPI-VAL": { "name": "validation", "description": "Validation or verification gap" },
+        "EPI-VER": { "name": "unverifiable", "description": "Claim cannot be independently verified" },
+        "EPI-SCP": { "name": "scope", "description": "Examined scope or evidence gaps left undeclared" }
       }
     },
 
