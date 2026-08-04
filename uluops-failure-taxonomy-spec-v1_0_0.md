@@ -44,7 +44,7 @@
 
 ## 1. Abstract
 
-This specification defines the **UluOps Failure Taxonomy**, a structured classification system for judgment failures detected by AI validation agents. The taxonomy classifies failures across four orthogonal domains — Structural, Semantic, Pragmatic, and Epistemic — with twenty-four distinct failure modes. Each failure mode is identified by a collision-free, fully-qualified code that encodes both domain and mode in a single token. The taxonomy is designed to be domain-portable (applicable to software, documents, prompts, specifications, and any artifact subject to quality judgment), runtime-classifiable (failures may be classified at detection time by agents, classifiers, or humans), and forward-compatible (new modes can be added without schema changes).
+This specification defines the **UluOps Failure Taxonomy**, a structured classification system for judgment failures detected by AI validation agents. The taxonomy classifies failures across four orthogonal domains — Structural, Semantic, Pragmatic, and Epistemic — with twenty-eight distinct failure modes. Each failure mode is identified by a collision-free, fully-qualified code that encodes both domain and mode in a single token. The taxonomy is designed to be domain-portable (applicable to software, documents, prompts, specifications, and any artifact subject to quality judgment), runtime-classifiable (failures may be classified at detection time by agents, classifiers, or humans), and forward-compatible (new modes can be added without schema changes).
 
 The system is novel in that it applies a linguistically-grounded failure ontology — drawn from the structural/semantic/pragmatic/epistemic hierarchy of language analysis — to the domain of AI-driven artifact validation, enabling systematic pattern recognition, blind-spot detection, and recursive self-improvement across heterogeneous agent populations.
 
@@ -1158,4 +1158,4 @@ This specification relates to the following UluOps provisional patents:
 
 ---
 
-*UluOps Failure Taxonomy Specification v1.0.0 — Linguistically-grounded, domain-portable classification with 24 failure modes, forward-compatible schema, full provenance tracking, and patent-ready novelty documentation.*
+*UluOps Failure Taxonomy Specification v1.0.0 — Linguistically-grounded, domain-portable classification with 28 failure modes, forward-compatible schema, full provenance tracking, and patent-ready novelty documentation.*

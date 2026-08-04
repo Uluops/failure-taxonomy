@@ -10,14 +10,14 @@ AI validation agents produce findings in their own vocabulary, using their own i
 
 ## The Solution
 
-### Four Domains, 24 Failure Modes
+### Four Domains, 28 Failure Modes
 
 | Domain | Layer | Question | Modes |
 |--------|-------|----------|-------|
-| **Structural (STR)** | Syntax | Is the artifact well-formed? | Omission, Excess, Malformation, Inconsistency, Syntax, Format |
-| **Semantic (SEM)** | Semantics | Is the artifact correct and coherent? | Incorrectness, Incompleteness, Ambiguity, Incoherence, Type Error, Logic Error |
-| **Pragmatic (PRA)** | Pragmatics | Does the artifact serve its purpose? | Misalignment, Mismatch, Inefficiency, Fragility, Documentation, Testing |
-| **Epistemic (EPI)** | Epistemics | Are claims warranted by evidence? | Overclaiming, Underclaiming, Ungrounded, Unfalsifiable, Validation Gap, Unverifiable |
+| **Structural (STR)** | Syntax | Is the artifact well-formed? | Omission, Excess, Malformation, Inconsistency, Syntax, Format, Organization |
+| **Semantic (SEM)** | Semantics | Is the artifact correct and coherent? | Incorrectness, Incompleteness, Ambiguity, Incoherence, Type Error, Logic Error, Misclassification |
+| **Pragmatic (PRA)** | Pragmatics | Does the artifact serve its purpose? | Misalignment, Mismatch, Inefficiency, Fragility, Documentation, Testing, Inactionable |
+| **Epistemic (EPI)** | Epistemics | Are claims warranted by evidence? | Overclaiming, Underclaiming, Ungrounded, Unfalsifiable, Validation Gap, Unverifiable, Scope |
 
 The first three domains draw from the established syntactic/semantic/pragmatic hierarchy of language analysis (Morris 1938, Carnap 1942, Austin 1962). The Epistemic domain is an original contribution — no prior failure taxonomy treats the evidential status of claims as a classification dimension equal to structural, semantic, and pragmatic correctness.
 
