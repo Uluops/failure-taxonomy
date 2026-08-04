@@ -128,6 +128,7 @@ Structural failures concern the **form** of an artifact — whether elements are
 | **Inconsistency** | `STR-INC` | Elements contradict structurally | "X doesn't match Y", "Inconsistent naming" | camelCase mixed with snake_case |
 | **Syntax** | `STR-SYN` | Syntax or formatting error in source | "Syntax error", "Parse failure" | Invalid YAML indentation, unterminated string |
 | **Format** | `STR-FMT` | Layout, presentation, or formatting issue | "Wrong format", "Layout broken" | Incorrect table alignment, broken Markdown rendering |
+| **Organization** | `STR-ORG` | Content present but ungrouped or poorly ordered | "Ungrouped", "Listed flat", "No structure" | Findings listed per-agent instead of pooled by theme |
 
 > **Disambiguation: STR-MAL vs. STR-SYN.** `STR-MAL` applies when an element's *structure* is wrong (e.g., a JSON object where an array is expected). `STR-SYN` applies when the source text fails to parse at all (e.g., invalid YAML). MAL is a well-formed-but-wrong-shape problem; SYN is a not-even-parseable problem.
 
@@ -145,6 +146,7 @@ Semantic failures concern the **meaning** of an artifact — whether its content
 | **Incoherence** | `SEM-COH` | Internal logical contradiction | "X contradicts Y", "Inconsistent logic" | Documentation says "required" but schema says "optional" |
 | **Type Error** | `SEM-TYP` | Type system violation | "Type mismatch", "Invalid cast" | String passed where number expected |
 | **Logic Error** | `SEM-LOG` | Logical reasoning flaw | "Off-by-one", "Boundary error", "Wrong operator" | Loop termination condition inverted |
+| **Misclassification** | `SEM-CAT` | Assigned to the wrong category, or distinct kinds conflated | "Wrong category", "Conflated with", "Not distinguished from" | Ceremony counted as necessary structure |
 
 > **Note on `SEM-COM`.** The code `COM` denotes a *completeness failure* (i.e., incompleteness). The mnemonic is "COMpleteness is missing."
 
@@ -164,6 +166,7 @@ Pragmatic failures concern the **contextual fit** of an artifact — whether it 
 | **Fragility** | `PRA-FRA` | Works now but breaks under change | "Brittle", "Tightly coupled", "Hard to maintain" | Hardcoded configuration values |
 | **Documentation** | `PRA-DOC` | Missing or inadequate documentation | "Undocumented", "Stale docs", "No API reference" | Public API with no usage examples |
 | **Testing** | `PRA-TST` | Insufficient test coverage | "Untested", "No regression tests", "Missing edge case tests" | Critical business logic with zero test coverage |
+| **Inactionable** | `PRA-ACT` | States a problem with no actionable consequence | "So what?", "No next step", "No operational consequence" | A finding that names a risk but implies no change |
 
 > **Disambiguation: PRA-ALI vs. PRA-MAT.** `PRA-ALI` (Misalignment): solution doesn't meet stated goal — *wrong outcome*. `PRA-MAT` (Mismatch): solution could work but wrong for context/audience — *wrong fit*.
 
@@ -183,6 +186,7 @@ Epistemic failures concern the **evidential basis** of claims within an artifact
 | **Unfalsifiable** | `EPI-FAL` | No way to verify or refute | "Vague claim", "Unmeasurable assertion" | "The system is user-friendly" with no metric |
 | **Validation Gap** | `EPI-VAL` | Validation or verification gap | "No acceptance criteria", "Untested assumption" | Requirement with no corresponding validation step |
 | **Unverifiable** | `EPI-VER` | Claim cannot be independently verified | "No reproduction steps", "Cannot confirm" | Performance claim with no reproducible benchmark |
+| **Scope** | `EPI-SCP` | Examined scope or evidence gaps left undeclared | "Scope not stated", "Limits not noted", "Gaps not flagged" | An audit that does not say what it did not examine |
 
 > **Note on Reproducibility.** Issues like "cannot reproduce locally", "flaky test", or "no steps to verify" map to `EPI-VER` (unverifiable) when the claim itself cannot be independently confirmed, or `EPI-GRN` (ungrounded) when the claim lacks traceable source support entirely.
 
@@ -263,6 +267,28 @@ EPI-*  → EPI
 **Validation constraint**: If both `failure_domain` and `failure_mode` are present, the mode's prefix MUST match the domain code.
 
 **Storage rule**: `failure_domain` is derived from `failure_mode` and stored redundantly for indexing performance. When `failure_mode` is present, `failure_domain` MUST be derived from it (not independently specified).
+
+### 5.2a Mode Boundaries
+
+Modes that sit close together are distinguished here so the distinction survives
+classification time rather than being re-litigated per finding.
+
+| pair | boundary |
+|---|---|
+| `STR-ORG` vs `SEM-CAT` | `STR-ORG` is how output is **grouped**; `SEM-CAT` is whether a label is **right**. *"Gaps organised by mechanism type"* is `STR-ORG`; *"posture classified with evidence"* is `SEM-CAT`. |
+| `STR-ORG` vs `STR-FMT` | `STR-FMT` is how it **looks**; `STR-ORG` is how it is **arranged**. |
+| `PRA-ACT` vs `PRA-ALI` | Different subject. `PRA-ALI` is the **artifact** failing its purpose; `PRA-ACT` is the **finding** giving its reader nothing to act on. A correct, well-aimed finding can still be inactionable. |
+| `EPI-SCP` vs `EPI-OVR` | `EPI-OVR` is going **beyond** what you know; `EPI-SCP` is **not saying where the edge was**. A perfectly calibrated agent can still fail `EPI-SCP`. |
+| `SEM-CAT` vs `SEM-INC` | A wrong category is a wrong **classification**, not a wrong **claim**. |
+
+**Out-of-charter content in an agent's own output is `STR-EXC`** (*"Unnecessary element
+present"*). An analyst that adds prescriptions, a present-tense agent that projects, a lens
+that drifts into another lens's method — none of these has failed its purpose, so `PRA-ALI` is
+the wrong reading. They did their job **and something extra**, which is excess.
+
+This is stated because the corpus has been reaching for a code to express it under at least
+six different spellings across four domains. The answer is an existing mode; it simply was
+never named.
 
 ### 5.3 Severity Consistency Rule
 
@@ -554,7 +580,29 @@ agent:
 
 1. Adding a new mode (e.g., `SEM-NEW`) does NOT require a schema change
 2. Agents using older schema versions can still process new modes
-3. Unknown-but-well-formed modes pass validation (with optional warning in strict mode)
+3. Unknown-but-well-formed modes pass **schema** validation, and **today they are also
+   accepted and stored at ingest.** Nothing on any live write path checks membership.
+   `deriveFailureTaxonomy` validates `failure_domain` against a domain enum and
+   `failure_severity_code` against a severity enum, but passes `failure_mode` through raw
+   in both of its return branches — that asymmetry is the structural reason 242 distinct
+   invented codes reached the datastore. `issues.failure_mode` is a plain string with no
+   foreign key and no CHECK against `failure_taxonomy`, and migration `040` widened it to
+   admit free-text names rather than narrowing it.
+
+   Membership enforcement is **specified but not shipped.** It goes at exactly two sites —
+   an ADL schema enum for build time, and an ops-api ingest membership check for the agent
+   that invents a code at runtime anyway — and it ships **last**, deliberately, because
+   enforcing before the corpus is migrated would reject 93 agents and 206 declarations.
+
+   Schema-level forward compatibility (points 1 and 2) is unaffected either way: the
+   pattern admits future modes, and adding one remains a data change rather than a schema
+   change.
+
+   > **This paragraph previously asserted the opposite** — that non-members were "rejected
+   > at ingest" by a catalog check in `deriveFailureTaxonomy`. No such check has ever
+   > existed at any layer. The claim is recorded here rather than silently deleted because
+   > a spec that describes an unshipped guard as shipped is worse than one that omits it:
+   > a reader concludes ingest is defended and stops defending it.
 
 Known modes are documented in `$comment` fields for reference, not enforced via enum.
 
@@ -1024,18 +1072,49 @@ This specification relates to the following UluOps provisional patents:
 # Full failure code (forward-compatible)
 ^(STR|SEM|PRA|EPI)-[A-Z]{3}/[CHMLI]$
 
-# Strict mode code (known modes only, v1.0.0)
-^(STR|SEM|PRA|EPI)-(OMI|EXC|MAL|INC|SYN|FMT|COM|AMB|COH|TYP|LOG|ALI|MAT|EFF|FRA|DOC|TST|OVR|UND|GRN|FAL|VAL|VER)$
+# Strict mode code (known modes only, v1.1.0)
+# Domain-SCOPED alternation, not a cross-product. The previous form,
+# ^(STR|SEM|PRA|EPI)-(OMI|...|VER)$, admitted 4 x 23 = 92 combinations for 24 valid modes
+# and therefore MATCHED SEM-VAL — the exact code this taxonomy's conformance work exists to
+# eliminate. A cross-product cannot express domain-mode binding. Generated from
+# failure-taxonomy-schema-defs; length is not a maintenance concern because it is not
+# hand-written.
+^(STR-(OMI|EXC|MAL|INC|SYN|FMT|ORG)|SEM-(INC|COM|AMB|COH|TYP|LOG|CAT)|PRA-(ALI|MAT|EFF|FRA|DOC|TST|ACT)|EPI-(OVR|UND|GRN|FAL|VAL|VER|SCP))$
 
-# Strict failure code (known modes only, v1.0.0)
-^(STR|SEM|PRA|EPI)-(OMI|EXC|MAL|INC|SYN|FMT|COM|AMB|COH|TYP|LOG|ALI|MAT|EFF|FRA|DOC|TST|OVR|UND|GRN|FAL|VAL|VER)/(C|H|M|L|I)$
+# Strict failure code (known modes only, v1.1.0)
+^(STR-(OMI|EXC|MAL|INC|SYN|FMT|ORG)|SEM-(INC|COM|AMB|COH|TYP|LOG|CAT)|PRA-(ALI|MAT|EFF|FRA|DOC|TST|ACT)|EPI-(OVR|UND|GRN|FAL|VAL|VER|SCP))/(C|H|M|L|I)$
 ```
 
 ---
 
 ## 13. Changelog
 
-### v1.0.0 (Current)
+### v1.1.0 (Current)
+
+- **Expanded taxonomy** from 24 to 28 modes (4 domains × 7 modes each), adding `STR-ORG`
+  (Organization), `SEM-CAT` (Misclassification), `PRA-ACT` (Inactionable) and `EPI-SCP` (Scope).
+  Each was adopted on attested corpus demand, re-measured per declaration rather than per code.
+- **Slot budget recorded: 7 modes per domain, 28 total, by design.** The previous 24 was 6×4
+  and equally deliberate, but was never written down — which is why proposals to extend it read
+  as accretion. A slot is filled when the corpus shows recurring demand, never to complete the
+  shape.
+- **§5.2a Mode Boundaries added** — the adjacent-mode distinctions, and `STR-EXC` named as the
+  home for out-of-charter content in an agent's own output.
+- **§7.3 point 3 amended, then CORRECTED (2026-08-03).** The v1.1.0 amendment claimed
+  well-formed non-member modes were "rejected at ingest" by a catalog check in
+  `deriveFailureTaxonomy`. **That was false — no such check has ever existed at any layer.**
+  Verified against `ops-uluops-api` `src/business-objects/failure-taxonomy.ts`:
+  `deriveFailureTaxonomy` validates `failure_domain` and `failure_severity_code` against
+  enums and passes `failure_mode` through raw in both return branches. §7.3 now states the
+  actual behaviour — non-members are accepted and stored — and marks enforcement as
+  specified-but-unshipped, shipping last by design. Schema-level forward compatibility was
+  never in question. This is the third instance in this arc of a document asserting what its
+  implementation lacks; the failure mode is that a reader concludes a guard exists and stops
+  building it.
+- **Canonical source declared:** `failure-taxonomy-schema-defs-v1_1_0.json`. Every other copy
+  of the mode set derives from it.
+
+### v1.0.0
 
 - **Rebranded** from "Cognitive Ops" to UluOps throughout
 - **Expanded taxonomy** from 16 to 24 modes (4 domains × 6 modes each):
